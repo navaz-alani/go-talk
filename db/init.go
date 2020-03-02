@@ -5,14 +5,19 @@ import (
 	"log"
 	"time"
 
+	"github.com/navaz-alani/entity/multiplexer"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+
+	"github.com/navaz-alani/go-talk/core"
 )
 
 const dbName = "go-talk"
 
-var db *mongo.Database
+var (
+	db *mongo.Database
+)
 
 /*
 Init initializes the database service for the
@@ -47,6 +52,8 @@ func Init(dbURI string) func(ctx context.Context) error {
 
 	db = client.Database(dbName)
 
+	InitEntities()
+
 	return client.Disconnect
 }
 
@@ -56,4 +63,18 @@ is being used.
 */
 func Db() *mongo.Database {
 	return db
+}
+
+/*
+InitEntities initializes the entities used within
+the backend eco-system.
+*/
+func InitEntities() {
+	mux, err := multiplexer.Create(db, core.User{})
+	if err != nil {
+		log.Println("fatal: entity init fail")
+		log.Fatal(err)
+	}
+
+	core.EMux = mux
 }
