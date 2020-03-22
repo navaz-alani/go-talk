@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+
+  go-talk_db:
+    container_name: go-talk_db
+    image: mongo:latest
+    restart: always
+    command: mongod
+    # exposed for testing
+    ports:
+      - "27017:27017"
+
+  go-talk_core:
+    container_name: go-talk_core
+    depends_on:
+      - "go-talk_db"
+    image: golang:latest
+    restart: always
+    volumes:
+      - .:/go/src/go-talk
+    ports:
+      - "4000:4000"
+    command: make --directory=src/go-talk
