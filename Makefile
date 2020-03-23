@@ -2,6 +2,7 @@ GO=go
 # output binary name
 OUT=go-talk
 
+
 exec:
 	$(GO) build -o $(OUT)
 	./$(OUT)

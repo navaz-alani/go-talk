@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 // Init initializes the core service's router.
@@ -14,5 +15,6 @@ func Init(host, port string) {
 	configureRoutes(m)
 
 	addr := fmt.Sprintf("%s:%s", host, port)
-	log.Fatal(http.ListenAndServe(addr, m))
+	log.Printf("Listening on %s", addr)
+	log.Fatal(http.ListenAndServe(addr, cors.AllowAll().Handler(m)))
 }

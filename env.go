@@ -4,6 +4,8 @@ import (
 	"log"
 
 	"github.com/navaz-alani/dotenv"
+
+	"github.com/navaz-alani/go-talk/core/auth"
 )
 
 var env *dotenv.Env
@@ -17,6 +19,8 @@ var required = []string{
 	"HOST",
 	"PORT",
 	"DB_URI",
+	"JWT_SS",
+	"JWT_ISS",
 }
 
 // envInit initializes some application parameters
@@ -32,4 +36,7 @@ func envInit(src string) {
 		log.Fatalln("err: expected definition in environment", undef)
 	}
 	env = e
+
+	// inject vars into auth package
+	auth.EnvInit(e.Get("JWT_ISS"), e.Get("JWT_SS"))
 }
