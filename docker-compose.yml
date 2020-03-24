@@ -22,3 +22,10 @@ services:
     ports:
       - "4000:4000"
     command: make --directory=src/go-talk
+
+  go-talk_frontend:
+    container_name: go-talk_frontend
+    image: node:latest
+    command: npm run build_and_serve
+    ports:
+    - "3000:3000"

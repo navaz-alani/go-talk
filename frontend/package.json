@@ -1,0 +1,26 @@
+{
+  "name": "go-talk-fe",
+  "version": "1.0.0",
+  "description": "Frontend for the  go-talk messaging service.",
+  "main": "sentinel.js",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start",
+    "build_and_serve":"next build && next start"
+  },
+  "author": "Navaz Alani",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "bootstrap": "^4.4.1",
+    "dotenv": "^8.2.0",
+    "next": "^9.3.0",
+    "parcel": "^1.12.4",
+    "react": "^16.13.0",
+    "react-bootstrap": "^1.0.0-beta.17",
+    "react-dom": "^16.13.0",
+    "universal-cookie": "^4.0.3",
+    "webpack": "^4.42.0"
+  }
+}
