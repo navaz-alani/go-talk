@@ -23,8 +23,12 @@ func (ci *ChatItem) Data() interface{} { return ci.data }
 func (ci *ChatItem) Kind() string      { return ci.kind }
 func (ci *ChatItem) From() string      { return ci.from }
 
-func (ci *ChatItem) Serialize() []byte {
-
+func (ci *ChatItem) Serialize() ([]byte, error) {
+	if data, err := json.Marshal(*ci); err != nil {
+		return nil, err
+	} else {
+		return data, nil
+	}
 }
 
 // NewChatItem creates a new ChatItem payload.
@@ -44,9 +48,9 @@ func NewChatItem(kind, dest string, data interface{}) *ChatItem {
 // given data. If successful, the error is nil.
 func DecodeChatItem(data []byte) (*ChatItem, error) {
 	var decoder struct {
-		Kind string `json:"kind"`
-		Dest string `json:"dest"`
-		From string `json:"from"`
+		Kind string      `json:"kind"`
+		Dest string      `json:"dest"`
+		From string      `json:"from"`
 		Data interface{} `json:"data"`
 	}
 

@@ -26,6 +26,9 @@ services:
   go-talk_frontend:
     container_name: go-talk_frontend
     image: node:latest
-    command: npm run build_and_serve
+    volumes:
+      - ./frontend:/frontend
+    working_dir: /frontend
+    command: make --directory=/frontend
     ports:
-    - "3000:3000"
+    - "5000:3000"

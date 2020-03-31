@@ -5,6 +5,7 @@ package chat
 
 import (
 	"encoding/json"
+	"fmt"
 
 	ws "github.com/gorilla/websocket"
 
@@ -17,9 +18,9 @@ import (
 // and the websocket connection.
 type Connection struct {
 	Service *Service
-	Sock   *ws.Conn
-	Owner  string
-	ToSend chan *payload.ChatItem
+	Sock    *ws.Conn
+	Owner   string
+	ToSend  chan *payload.ChatItem
 	Control chan *payload.ControlItem
 }
 
@@ -87,8 +88,13 @@ func (c *Connection) readFromSock() {
 func (c *Connection) writeToSock() {
 	for {
 		select {
-		case msg := <- c.ToSend:
-			err := c.Sock.WriteMessage(ws.TextMessage, msg.Serialize())
+		case msg := <-c.ToSend:
+			data, err := msg.Serialize()
+			if err != nil {
+				c.Service.control <- payload.NewErr(msg.From(),
+					fmt.Sprintf("error: serialization fail, %s", err.Error()))
+			}
+			err = c.Sock.WriteMessage(ws.TextMessage, data)
 			if err != nil {
 				err := payload.NewErr(msg.From(),
 					"error: [sock] failed to write")
@@ -96,4 +102,11 @@ func (c *Connection) writeToSock() {
 			}
 		}
 	}
+}
+
+// Listen is a routine which starts the read and write
+// routines over the websocket connection for the client.
+func (c *Connection) Listen() {
+	go c.writeToSock()
+	go c.readFromSock()
 }

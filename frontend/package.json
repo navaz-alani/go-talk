@@ -7,7 +7,7 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "build_and_serve":"next build && next start"
+    "serve_prod": "npm install && next build && next start"
   },
   "author": "Navaz Alani",
   "license": "MIT",

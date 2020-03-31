@@ -1,10 +1,16 @@
 package chat
 
 import (
+	"net/http"
+
+	ws "github.com/gorilla/websocket"
+
 	"github.com/navaz-alani/go-talk/core/chat/payload"
 )
 
 type UID = string
+
+var ChatService *Service
 
 type Service struct {
 	Active map[UID]*Connection
@@ -30,7 +36,7 @@ func (s Service) Run() {
 			if destConn := s.Active[dest]; destConn != nil {
 				destConn.ToSend <- p
 			}
-		case ci := <- s.control:
+		case ci := <-s.control:
 			switch ci.Kind() {
 			case payload.CtrlNewChat:
 				// create a new chat
@@ -43,7 +49,7 @@ func (s Service) Run() {
 // Init initializes the core component's chat
 // service.
 func Init() {
-	chatService := Service{
+	ChatService := &Service{
 		Active:     make(map[UID]*Connection),
 		register:   make(chan *Connection),
 		unregister: make(chan *Connection),
@@ -51,5 +57,27 @@ func Init() {
 		control:    make(chan *payload.ControlItem),
 	}
 
-	go chatService.Run()
+	go ChatService.Run()
+}
+
+// NewConnection takes a request to initiate a connection with
+// the chat service and upgrades it to a websocket connection
+// which can be for real-time chat.
+func NewConnection(w http.ResponseWriter, r *http.Request) {
+	c, err := (&ws.Upgrader{}).Upgrade(w, r, nil)
+	if err != nil {
+		http.Error(w, "error: [chat] failed to upgrade protocol",
+			http.StatusInternalServerError)
+	}
+
+	uid := r.Context().Value("uid").(string)
+	conn := &Connection{
+		Service: ChatService,
+		Sock:    c,
+		Owner:   uid,
+		ToSend:  make(chan *payload.ChatItem),
+		Control: make(chan *payload.ControlItem),
+	}
+
+	ChatService.register <- conn
 }

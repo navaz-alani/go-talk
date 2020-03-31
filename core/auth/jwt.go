@@ -90,7 +90,8 @@ func JWTVerifyMW(next http.HandlerFunc) http.HandlerFunc {
 		splitToken := strings.Split(reqToken, " ")
 
 		if len(splitToken) != 2 {
-			http.Error(w, "", http.StatusBadRequest)
+			http.Error(w, "this is an authorized endpoint",
+				http.StatusUnauthorized)
 			return
 		}
 
@@ -104,7 +105,7 @@ func JWTVerifyMW(next http.HandlerFunc) http.HandlerFunc {
 				next(w, reqWithUid)
 			}
 		} else {
-			http.Error(w, "", http.StatusUnauthorized)
+			http.Error(w, "token decode fail", http.StatusUnauthorized)
 			return
 		}
 	}
