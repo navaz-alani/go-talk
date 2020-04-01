@@ -85,20 +85,28 @@ context under the same key.
 */
 func JWTVerifyMW(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		reqToken := r.Header.Get("Authorization")
+		wsToken := r.Header.Get("Sec-WebSocket-Protocol")
 		splitToken := strings.Split(reqToken, " ")
 
-		if len(splitToken) != 2 {
+		if len(wsToken) == 0 && len(splitToken) != 2 {
 			http.Error(w, "this is an authorized endpoint",
 				http.StatusUnauthorized)
 			return
 		}
 
-		token, err := decodeToken(strings.TrimSpace(splitToken[1]))
+		var tokenString string
+		if len(reqToken) != 0 {
+			tokenString = strings.TrimSpace(splitToken[1])
+		} else {
+			tokenString = wsToken
+		}
+
+		token, err := decodeToken(tokenString)
 		if err == nil && token.Valid {
 			if uid, ok := getClaims(token)["uid"].(string); !ok {
 				http.Error(w, "invalid token", http.StatusUnauthorized)
+				return
 			} else {
 				reqWithUid := r.WithContext(context.WithValue(
 					context.TODO(), "uid", uid))

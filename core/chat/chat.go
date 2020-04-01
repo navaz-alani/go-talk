@@ -6,7 +6,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/navaz-alani/go-talk/core/auth"
-	"github.com/navaz-alani/go-talk/core/chat/message"
 )
 
 const IDLen = 25
@@ -21,7 +20,6 @@ type Chat struct {
 	ChatID       string             `json:"chatID" _ax_:"true" _ix_:"true"`
 	Type         string             `json:"type"`
 	Participants []UID              `json:"participants"`
-	Messages     []message.MsgID    `json:"messages"`
 }
 
 // NewFromControl takes a control message to create
@@ -32,6 +30,5 @@ func NewFromControl() *Chat {
 		ChatID:       auth.Key(IDLen),
 		Type:         "",
 		Participants: nil,
-		Messages:     nil,
 	}
 }

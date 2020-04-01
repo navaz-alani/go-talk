@@ -6,6 +6,7 @@ package chat
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 
 	ws "github.com/gorilla/websocket"
 
@@ -29,18 +30,23 @@ type Connection struct {
 // upstream service for distribution.
 // All incoming messages are saved upon receipt.
 func (c *Connection) readFromSock() {
+	var unexpectedClose bool
 	defer func() {
-		c.Service.unregister <- c
-		_ = c.Sock.Close()
+		if !unexpectedClose {
+			c.Service.unregister <- c
+			_ = c.Sock.Close()
+		}
 	}()
 
 	for {
 		msgType, msg, err := c.Sock.ReadMessage()
 		if err != nil {
+			log.Println("read err: ", err)
 			if ws.IsUnexpectedCloseError(err, ws.CloseGoingAway,
 				ws.CloseAbnormalClosure) {
 				c.Service.control <- payload.NewErr(c.Owner,
 					"error: [sock] connection unexpectedly closed")
+				unexpectedClose = true
 			}
 			break
 		}

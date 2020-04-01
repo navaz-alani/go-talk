@@ -7,6 +7,7 @@ import (
 	"github.com/navaz-alani/entity/multiplexer"
 	"github.com/navaz-alani/entity/multiplexer/muxHandle"
 
+	"github.com/navaz-alani/go-talk/core/chat"
 	"github.com/navaz-alani/go-talk/core/router"
 	"github.com/navaz-alani/go-talk/core/user"
 )
@@ -47,6 +48,7 @@ func entityInit(db muxHandle.DBHandler) {
 
 // Init initializes the application's core service.
 func Init(host, port string, db muxHandle.DBHandler) {
+	chat.Init()
 	entityInit(db)
 	router.Init(host, port)
 }

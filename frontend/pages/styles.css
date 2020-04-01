@@ -1,6 +1,37 @@
+body {
+    background: #a5ccd1;
+}
+
 #main {
+    flex: 3;
     display: flex;
     flex-direction: column;
     align-items: center;
-    flex: 1;
+}
+
+#app-description {
+    text-align: center;
+}
+
+#main-container {
+    background-color: white;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    width: 75vw;
+    margin: 0 auto;
+
+    justify-content: space-between;
+}
+
+#footer {
+    padding: 10px;
+    width: 100%;
+    background-color: white;
+    text-align: center;
+}
+
+#gh-link {
+    height: 50px;
+    margin-bottom: 20px;
 }

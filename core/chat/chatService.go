@@ -1,6 +1,7 @@
 package chat
 
 import (
+	"log"
 	"net/http"
 
 	ws "github.com/gorilla/websocket"
@@ -28,8 +29,10 @@ func (s Service) Run() {
 	for {
 		select {
 		case c := <-s.register:
+			log.Println("<- registered")
 			s.Active[c.Owner] = c
 		case c := <-s.unregister:
+			log.Println("<- unregistered")
 			delete(s.Active, c.Owner)
 		case p := <-s.distribute:
 			dest := (*p).Dest()
@@ -37,10 +40,8 @@ func (s Service) Run() {
 				destConn.ToSend <- p
 			}
 		case ci := <-s.control:
-			switch ci.Kind() {
-			case payload.CtrlNewChat:
-				// create a new chat
-
+			if destConn := s.Active[ci.Dest()]; destConn != nil {
+				destConn.Control <- ci
 			}
 		}
 	}
@@ -49,7 +50,7 @@ func (s Service) Run() {
 // Init initializes the core component's chat
 // service.
 func Init() {
-	ChatService := &Service{
+	ChatService = &Service{
 		Active:     make(map[UID]*Connection),
 		register:   make(chan *Connection),
 		unregister: make(chan *Connection),
@@ -64,7 +65,12 @@ func Init() {
 // the chat service and upgrades it to a websocket connection
 // which can be for real-time chat.
 func NewConnection(w http.ResponseWriter, r *http.Request) {
-	c, err := (&ws.Upgrader{}).Upgrade(w, r, nil)
+	log.Println("connection request received.")
+	c, err := (&ws.Upgrader{
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}).Upgrade(w, r, nil)
 	if err != nil {
 		http.Error(w, "error: [chat] failed to upgrade protocol",
 			http.StatusInternalServerError)
@@ -79,5 +85,6 @@ func NewConnection(w http.ResponseWriter, r *http.Request) {
 		Control: make(chan *payload.ControlItem),
 	}
 
+	conn.Listen()
 	ChatService.register <- conn
 }

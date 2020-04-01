@@ -7,14 +7,21 @@ import Button from "react-bootstrap/Button";
 import Tabs from "react-bootstrap/Tabs";
 import Tab from "react-bootstrap/Tab";
 import field from "../../components/field/fields";
+import {w3cwebsocket as W3CWebsocket} from "websocket"
 
 import getConfig from 'next/config'
+import Footer from "../../components/footer/footer";
 const { publicRuntimeConfig } = getConfig();
 
 const Auth = () => {
     let cookies = new Cookies();
-    // todo: check if the user has a cookie stored,
-    //     if so, send user directly to home page.
+    let authTok = cookies.get(publicRuntimeConfig.AUTH_COOKIE);
+    if (authTok !== "") {
+        let ws = new W3CWebsocket(`${publicRuntimeConfig.BE.replace("http", "ws")}/connect`,
+            authTok)
+
+    }
+
     let name = new field(
         "Name", "", "text",
         "Your Name", /(.|\n)*?/, ""
@@ -94,6 +101,7 @@ const Auth = () => {
     };
 
     return (
+        <div id="main-container">
         <div id="auth-window">
             <h1 className="auth-heading main-name">go-talk</h1>
             <h2 className="auth-heading">Authentication</h2>
@@ -132,6 +140,8 @@ const Auth = () => {
                 </Tab>
             </Tabs>
         </div>
+        <Footer/>
+            </div>
     );
 };
 
