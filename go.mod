@@ -8,6 +8,6 @@ require (
 	github.com/navaz-alani/dotenv v0.1.0
 	github.com/navaz-alani/entity v0.1.11
 	github.com/rs/cors v1.7.0
-	go.mongodb.org/mongo-driver v1.3.1
-	golang.org/x/crypto v0.0.0-20190530122614-20be4c3c3ed5
+	go.mongodb.org/mongo-driver v1.5.1
+	golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073
 )
